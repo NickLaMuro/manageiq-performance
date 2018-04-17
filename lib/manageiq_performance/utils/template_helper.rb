@@ -19,7 +19,7 @@ module TemplateHelper
   end
 
   def template_dir
-    @template_dir ||= File.expand_path "../templates", __FILE__
+    @template_dir ||= File.expand_path "../../templates", __FILE__
   end
 
   if RUBY_VERSION >= "2.6"
