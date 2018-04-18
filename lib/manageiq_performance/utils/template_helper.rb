@@ -3,7 +3,7 @@ module TemplateHelper
     partial_binding = binding.dup
     set_locals locals, partial_binding
 
-    template = get_template_for partial
+    template = get_template_for partial, true
     process_erb(template, partial_binding)
   end
 
@@ -13,9 +13,9 @@ module TemplateHelper
     end
   end
 
-  def get_template_for partial
-    filename = "_#{partial}.rb.erb"
-    File.read File.join(template_dir, filename)
+  def get_template_for template, partial = false
+    filename = "#{'_' if partial}#{template}.rb.erb"
+    File.read File.join(partial ? partial_dir : template_dir, filename)
   end
 
   def template_dir
@@ -30,5 +30,16 @@ module TemplateHelper
     def process_erb template, erb_binding
       ERB.new(template, nil, "-").result(erb_binding)
     end
+  end
+
+  def partial_dir
+    @partial_dir ||= begin
+                       dir = File.join template_dir, partial_folder
+                       File.expand_path dir, __FILE__
+                     end
+  end
+
+  def partial_folder
+    ""
   end
 end
