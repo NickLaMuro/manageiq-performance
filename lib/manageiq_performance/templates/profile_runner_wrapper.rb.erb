@@ -62,7 +62,6 @@ StackProf.start(mode: :<%= @opts[:stackprof_mode] %>, interval: <%= @opts[:stack
 <% end -%>
 
 <% if @opts[:target_type] == :rake && @profile_target -%>
-require "rake"
 <% # If there are no @profile_target present, even though the default -%>
 <% # target is a "file" target, load rails to for a static analisis   -%>
 <% # of the app boot                                                  -%>
@@ -90,6 +89,8 @@ ManageIQPerformance.profile('profile_runner', profile_opts) do
 <% if @opts[:target_type] == :file && @profile_target -%>
 require "<%= @cmd_root.join @profile_target %>"
 <% elsif @opts[:target_type] == :rake && @profile_target -%>
+require "<%= @cmd_root.join 'config', 'boot' %>"
+require "rake"
 Rake.application.run
 <% elsif [:eval, :rails].include? @opts[:target_type] -%>
 <%= ARGV.join(" ") unless ARGV.empty? %>
