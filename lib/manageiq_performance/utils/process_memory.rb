@@ -29,7 +29,13 @@ require "bigdecimal"
 module ManageIQPerformance
   module Utils
     module ProcessMemory
-      MB_BYTES = ::BigDecimal.new(1_048_576)
+      if RUBY_VERSION >= "2.6"
+        def self.big_decimal(val); BigDecimal(val); end
+      else
+        def self.big_decimal(val); BigDecimal.new(val); end
+      end
+
+      MB_BYTES = big_decimal(1_048_576)
 
     # Travis doesn't seem to like Sys::ProcTable very much, and doesn't seem to
     # return accurate results... so favor reading from /proc/PID/status when
@@ -44,7 +50,7 @@ module ManageIQPerformance
           rss_line = PROC_STATUS_FILE.each_line.grep(VMRSS_GREP_EXP).first
           return unless rss_line
           return unless (_name, value, unit = rss_line.split(nil)).length == 3
-          (CONVERSION[unit.downcase!] * ::BigDecimal.new(value)) / MB_BYTES
+          (CONVERSION[unit.downcase!] * big_decimal(value)) / MB_BYTES
         rescue Errno::EACCES, Errno::ENOENT
           0
         end
@@ -64,11 +70,17 @@ module ManageIQPerformance
     elsif %w[linux darwin].include?(Gem::Platform.local.os)
 
       def self.get
-        ((1024 * BigDecimal.new(`ps -o rss= -p #{Process.pid}`))/MB_BYTES).to_f
+        ((1024 * big_decimal(`ps -o rss= -p #{Process.pid}`))/MB_BYTES).to_f
       end
 
     end
 
+    end
+
+    private
+
+    def big_decimal(val)
+      self.class.big_decimal(val)
     end
   end
 end
