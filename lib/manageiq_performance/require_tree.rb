@@ -42,7 +42,7 @@ module ManageIQPerformance
     end
 
     def initialize(name)
-      @name     = name
+      @name     = name.to_s
       @children = {}
       @cost     = 0
     end
