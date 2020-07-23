@@ -1,7 +1,7 @@
 <% if @opts[:include_bundler] || @opts[:target_type] == :rake -%>
-require "rubygems"
 <% end -%>
 <% if @opts[:include_bundler] -%>
+require "rubygems"
 require "bundler/setup"
 <% end -%>
 
